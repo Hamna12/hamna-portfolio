@@ -82,7 +82,7 @@ nav.scrolled{border-bottom-color:var(--line)}
 
 /* ------- hero ------- */
 #hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center}
-#field{position:absolute;inset:0;z-index:1}
+#field{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
 .hero-inner{position:relative;z-index:2;text-align:center;padding:0 24px;max-width:900px}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase;margin-bottom:22px;opacity:0;animation:rise .9s .3s forwards}
 .eyebrow .dot{color:var(--amber)}
@@ -850,6 +850,7 @@ footer .const{opacity:.7}
     }
     window.addEventListener('resize', resize);
     resize();
+    setTimeout(resize, 300); setTimeout(resize, 1200);
 
     var t0 = performance.now();
     var heroVisible = true;
