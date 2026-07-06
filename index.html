@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hamna Qaseem — AI Engineer · Robotics & Intelligent Systems</title>
+<meta name="description" content="Hamna Qaseem — AI Engineer and Researcher exploring trustworthy AI, robotics, and future human habitats. Designing intelligent futures.">
+<meta property="og:title" content="Hamna Qaseem — AI Engineer · Designing Intelligent Futures">
+<meta property="og:description" content="AI Engineer and Researcher exploring trustworthy AI, robotics, and future human habitats — sharing practical lessons for builders, students, and founders.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/foundermind.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='3' fill='%236FB7FF'/><circle cx='16' cy='16' r='11' fill='none' stroke='%236FB7FF' stroke-width='1' opacity='0.5' stroke-dasharray='4 3'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#070B14;
+  --rose:#F2A0C6;
+  --rose-dim:rgba(242,160,198,.14);
+  --bg-panel:#0C1322;
+  --bg-raise:#101A2E;
+  --line:rgba(148,178,220,.13);
+  --line-strong:rgba(148,178,220,.28);
+  --text:#D7E1F0;
+  --muted:#8494AD;
+  --faint:#5A6A85;
+  --accent:#6FB7FF;
+  --accent-dim:rgba(111,183,255,.14);
+  --amber:#FFB454;
+  --amber-dim:rgba(255,180,84,.12);
+  --glow:rgba(111,183,255,.35);
+  --display:'Chakra Petch',sans-serif;
+  --body:'IBM Plex Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-weight:300;line-height:1.65;overflow-x:hidden}
+::selection{background:var(--accent);color:#06101E}
+a{color:var(--accent);text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ------- custom cursor (scanner) ------- */
+@media (pointer:fine){
+  .cursor{position:fixed;top:0;left:0;width:26px;height:26px;border:1px solid var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s,background .25s;mix-blend-mode:screen}
+  .cursor::after{content:'';position:absolute;top:50%;left:50%;width:3px;height:3px;background:var(--accent);border-radius:50%;transform:translate(-50%,-50%)}
+  .cursor.scan{width:52px;height:52px;border-color:var(--amber);background:rgba(255,180,84,.05)}
+}
+@media (pointer:coarse){.cursor{display:none}}
+
+/* ------- boot loader ------- */
+#boot{position:fixed;inset:0;background:var(--bg);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .8s,visibility .8s}
+#boot.done{opacity:0;visibility:hidden}
+.boot-ring{width:64px;height:64px;position:relative}
+.boot-ring svg{animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.boot-log{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.12em;text-align:center;min-height:16px}
+.boot-log .ok{color:var(--accent)}
+.boot-bar{width:180px;height:1px;background:var(--line);position:relative;overflow:hidden}
+.boot-bar::after{content:'';position:absolute;inset:0;background:var(--accent);transform-origin:left;animation:load 1.9s ease forwards}
+@keyframes load{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* ------- nav ------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:800;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;backdrop-filter:blur(14px);background:rgba(7,11,20,.6);border-bottom:1px solid transparent;transition:border-color .4s}
+nav.scrolled{border-bottom-color:var(--line)}
+.nav-id{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--text)}
+.nav-id b{color:var(--accent);font-weight:500}
+.nav-links{display:flex;gap:26px;list-style:none}
+.nav-links a{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted);transition:color .25s;text-transform:uppercase}
+.nav-links a:hover{color:var(--accent)}
+.nav-toggle{display:none;background:none;border:1px solid var(--line-strong);color:var(--text);font-family:var(--mono);font-size:11px;padding:7px 12px;letter-spacing:.1em;cursor:pointer}
+@media (max-width:900px){
+  nav{padding:14px 20px}
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:rgba(7,11,20,.97);border-bottom:1px solid var(--line);padding:8px 0}
+  .nav-links.open{display:flex}
+  .nav-links li{padding:11px 24px;border-top:1px solid var(--line)}
+  .nav-toggle{display:block}
+}
+
+/* ------- hero ------- */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center}
+#field{position:absolute;inset:0;z-index:1}
+.hero-inner{position:relative;z-index:2;text-align:center;padding:0 24px;max-width:900px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase;margin-bottom:22px;opacity:0;animation:rise .9s .3s forwards}
+.eyebrow .dot{color:var(--amber)}
+.eyebrow-sub{display:block;margin-top:10px;font-size:10px;letter-spacing:.34em;color:var(--faint)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(44px,8vw,88px);line-height:1.02;letter-spacing:.01em;opacity:0;animation:rise .9s .5s forwards}
+h1 .thin{font-weight:400;color:var(--muted)}
+.hero-role{font-family:var(--display);font-weight:500;font-size:clamp(15px,2.2vw,20px);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-top:18px;opacity:0;animation:rise .9s .7s forwards}
+.hero-sub{max-width:560px;margin:22px auto 0;color:var(--muted);font-size:16px;opacity:0;animation:rise .9s .9s forwards}
+.hero-cta{margin-top:38px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;opacity:0;animation:rise .9s 1.1s forwards}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.btn{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:13px 26px;border:1px solid var(--accent);color:var(--accent);background:transparent;cursor:pointer;transition:.3s;position:relative}
+.btn:hover{background:var(--accent-dim);box-shadow:0 0 24px var(--glow)}
+.btn.solid{background:var(--accent);color:#06101E;font-weight:500}
+.btn.solid:hover{box-shadow:0 0 32px var(--glow)}
+.telemetry{position:absolute;bottom:0;left:0;right:0;z-index:2;border-top:1px solid var(--line);display:flex;justify-content:center;flex-wrap:wrap;backdrop-filter:blur(8px);background:rgba(7,11,20,.35)}
+.tele-item{padding:16px 34px;border-right:1px solid var(--line);text-align:center}
+.tele-item:last-child{border-right:none}
+.tele-item .val{font-family:var(--display);font-weight:600;font-size:22px;color:var(--text)}
+.tele-item .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--faint);text-transform:uppercase;margin-top:2px}
+@media (max-width:700px){.tele-item{padding:12px 16px;flex:1 1 40%}}
+
+/* ------- section scaffolding ------- */
+section{position:relative;padding:110px 40px;max-width:1180px;margin:0 auto}
+@media (max-width:700px){section{padding:72px 20px}}
+.sec-head{margin-bottom:56px}
+.sec-tag{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--amber);text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.sec-tag::before{content:'';width:28px;height:1px;background:var(--amber)}
+.sec-title{font-family:var(--display);font-weight:600;font-size:clamp(28px,4.4vw,44px);margin-top:14px;letter-spacing:.01em}
+.sec-sub{color:var(--muted);max-width:640px;margin-top:12px;font-size:15px}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ------- about / operator profile ------- */
+.about-grid{display:grid;grid-template-columns:340px 1fr;gap:64px;align-items:start}
+@media (max-width:900px){.about-grid{grid-template-columns:1fr;gap:44px}}
+.hud{position:relative;width:300px;height:300px;margin:0 auto}
+.hud-photo{position:absolute;inset:22px;border-radius:50%;overflow:hidden;border:1px solid var(--line-strong)}
+.hud-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(.92)}
+.hud-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(7,11,20,.35));pointer-events:none}
+.hud-scan{position:absolute;inset:22px;border-radius:50%;overflow:hidden;pointer-events:none}
+.hud-scan::before{content:'';position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.7;animation:scanline 4.5s ease-in-out infinite}
+@keyframes scanline{0%,100%{top:8%}50%{top:88%}}
+.hud-ring{position:absolute;inset:0;animation:spin 26s linear infinite}
+.hud-ring.r2{inset:8px;animation:spinRev 40s linear infinite}
+@keyframes spinRev{to{transform:rotate(-360deg)}}
+.hud-label{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--accent);background:var(--bg);border:1px solid var(--line-strong);padding:5px 14px;white-space:nowrap}
+.about-copy p{color:var(--muted);margin-bottom:18px;font-size:15.5px}
+.about-copy p b{color:var(--text);font-weight:500}
+.roles{margin-top:28px;display:grid;gap:0;border:1px solid var(--line)}
+.role{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:13px 18px;border-bottom:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.role:last-child{border-bottom:none}
+.role .r-title{color:var(--text);font-weight:400}
+.role .r-org{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em}
+.role .live{color:var(--amber)}
+.role .live::before{content:'●';font-size:8px;margin-right:6px;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+.hud-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s}
+.hud-photo .ph-sim{opacity:0}
+.hud.sim .ph-sim{opacity:1}
+.hud.sim .ph-real{opacity:0}
+.hud-toggle{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--faint);background:var(--bg);border:1px solid var(--line);padding:4px 12px;cursor:pointer;transition:.3s;white-space:nowrap}
+.hud-toggle:hover{color:var(--amber);border-color:rgba(255,180,84,.4)}
+
+/* ------- research focus ------- */
+.focus-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:900px){.focus-grid{grid-template-columns:1fr}}
+.focus-card{border:1px solid var(--line);background:var(--bg-panel);padding:30px 26px;position:relative;overflow:hidden;transition:border-color .35s,transform .35s}
+.focus-card:hover{border-color:var(--line-strong);transform:translateY(-4px)}
+.focus-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:0;transition:opacity .35s}
+.focus-card:hover::before{opacity:1}
+.focus-card .f-ico{margin-bottom:20px}
+.focus-card h3{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.03em;margin-bottom:12px}
+.focus-card p{color:var(--muted);font-size:14px}
+.focus-card .f-code{position:absolute;top:18px;right:20px;font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.16em}
+
+/* ------- projects ------- */
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px}
+.filter{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:9px 18px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;transition:.25s}
+.filter:hover{border-color:var(--accent);color:var(--accent)}
+.filter.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media (max-width:1000px){.proj-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.proj-grid{grid-template-columns:1fr}}
+.proj{border:1px solid var(--line);background:var(--bg-panel);display:flex;flex-direction:column;transition:border-color .35s,transform .35s,box-shadow .35s;position:relative}
+.proj:hover{border-color:var(--line-strong);transform:translateY(-5px);box-shadow:0 18px 44px rgba(0,0,0,.45)}
+.proj.hide{display:none}
+.thumb{aspect-ratio:16/9;border-bottom:1px solid var(--line);background:var(--bg-raise);position:relative;overflow:hidden}
+.thumb svg{width:100%;height:100%}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.96)}
+.proj-body{padding:22px 22px 24px;display:flex;flex-direction:column;flex:1}
+.proj-code{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--amber)}
+.proj h3{font-family:var(--display);font-weight:600;font-size:16.5px;margin:9px 0 10px;letter-spacing:.02em}
+.proj p{color:var(--muted);font-size:13.5px;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--faint);border:1px solid var(--line);padding:4px 9px}
+.proj-links{display:flex;gap:16px;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+.proj-links a{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px}
+.proj-links a:hover{color:var(--amber)}
+
+/* ------- robotics lab ------- */
+#lab{max-width:none;background:var(--bg-panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.lab-inner{max-width:1180px;margin:0 auto}
+.fsm-wrap{border:1px solid var(--line);background:var(--bg);padding:34px 24px;margin:44px 0;overflow-x:auto}
+.fsm-wrap svg{min-width:760px;width:100%}
+.lab-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:12px}
+@media (max-width:900px){.lab-cols{grid-template-columns:1fr}}
+.lab-card{border:1px solid var(--line);background:var(--bg);padding:28px 26px}
+.lab-card h4{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.lab-card ul{list-style:none}
+.lab-card li{color:var(--muted);font-size:14px;padding:8px 0 8px 20px;position:relative;border-bottom:1px solid var(--line)}
+.lab-card li:last-child{border-bottom:none}
+.lab-card li::before{content:'▸';position:absolute;left:0;color:var(--amber);font-size:11px;top:11px}
+
+/* ------- experience ------- */
+.timeline{position:relative;padding-left:36px}
+.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,var(--accent),var(--line) 70%)}
+.t-item{position:relative;padding-bottom:46px}
+.t-item:last-child{padding-bottom:0}
+.t-item::before{content:'';position:absolute;left:-33px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+.t-item.current::before{background:var(--amber);border-color:var(--amber);box-shadow:0 0 14px rgba(255,180,84,.6)}
+.t-date{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amber);text-transform:uppercase}
+.t-item h3{font-family:var(--display);font-weight:600;font-size:19px;margin:8px 0 3px}
+.t-org{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.06em;margin-bottom:12px}
+.t-item p{color:var(--muted);font-size:14.5px;max-width:720px}
+
+/* ------- skills ------- */
+.sys-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+@media (max-width:800px){.sys-grid{grid-template-columns:1fr}}
+.sys{border:1px solid var(--line);background:var(--bg-panel);padding:26px}
+.sys h4{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;display:flex;justify-content:space-between}
+.sys h4 span:last-child{color:var(--faint)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 13px;transition:.25s;cursor:default}
+.chip:hover{border-color:var(--rose);color:var(--rose);box-shadow:0 0 14px var(--rose-dim)}
+
+/* ------- awards & community ------- */
+.aw-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+@media (max-width:800px){.aw-grid{grid-template-columns:1fr}}
+.aw{border:1px solid var(--line);background:var(--bg-panel);padding:24px 26px;display:flex;gap:18px;align-items:flex-start}
+.aw .a-ico{flex-shrink:0;margin-top:3px}
+.aw h4{font-family:var(--display);font-weight:600;font-size:15px;margin-bottom:5px}
+.aw p{color:var(--muted);font-size:13.5px}
+.aw .a-meta{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.14em;margin-top:8px;text-transform:uppercase}
+
+/* ------- vision ------- */
+#vision{max-width:none;background:radial-gradient(ellipse 50% 40% at 78% 105%,rgba(242,160,198,.06),transparent 60%),radial-gradient(ellipse 80% 60% at 50% 110%,rgba(111,183,255,.07),transparent 60%),var(--bg);border-top:1px solid var(--line);text-align:center;overflow:hidden}
+.vision-inner{max-width:780px;margin:0 auto;position:relative;z-index:2}
+.vision-inner blockquote{font-family:var(--display);font-weight:400;font-size:clamp(19px,2.8vw,26px);line-height:1.55;color:var(--text);margin-top:30px}
+.vision-inner blockquote em{color:var(--accent);font-style:normal}
+.v-path{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin-top:44px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.v-node{color:var(--muted);padding:8px 14px;border:1px solid var(--line)}
+.v-node:last-child{color:var(--amber);border-color:rgba(255,180,84,.4)}
+.v-link{width:26px;height:1px;background:var(--line-strong)}
+.horizon{position:absolute;bottom:-2px;left:0;right:0;height:140px;z-index:1;pointer-events:none}
+
+/* ------- contact ------- */
+#contact{text-align:center}
+.c-mail{font-family:var(--display);font-weight:600;font-size:clamp(20px,3.6vw,34px);display:inline-block;margin:26px 0 40px;border-bottom:1px solid var(--line-strong);padding-bottom:8px;transition:.3s;color:var(--text)}
+.c-mail:hover{color:var(--accent);border-color:var(--accent)}
+.c-links{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.c-links a{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line);padding:12px 24px;color:var(--muted);transition:.3s}
+.c-links a:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px var(--accent-dim)}
+
+footer{border-top:1px solid var(--line);padding:30px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;max-width:1180px;margin:0 auto}
+footer span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--faint)}
+footer .const{opacity:.7}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<div id="boot">
+  <div class="boot-ring">
+    <svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="26" stroke="#6FB7FF" stroke-width="1" opacity=".3"/><circle cx="32" cy="32" r="26" stroke="#6FB7FF" stroke-width="1.5" stroke-dasharray="40 130" stroke-linecap="round"/><circle cx="32" cy="32" r="3" fill="#FFB454"/></svg>
+  </div>
+  <div class="boot-bar"></div>
+  <div class="boot-log" id="bootlog">INITIALIZING SYSTEMS…</div>
+</div>
+
+<nav id="nav">
+  <div class="nav-id"><b>HQ</b> · HAMNA QASEEM</div>
+  <button class="nav-toggle" id="navToggle">MENU</button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about">Profile</a></li>
+    <li><a href="#focus">Research</a></li>
+    <li><a href="#projects">Modules</a></li>
+    <li><a href="#lab">Learning Lab</a></li>
+    <li><a href="#experience">Log</a></li>
+    <li><a href="#contact">Collaborate</a></li>
+  </ul>
+</nav>
+
+<header id="hero">
+  <canvas id="field"></canvas>
+  <div class="hero-inner">
+    <div class="eyebrow">DESIGNING INTELLIGENT FUTURES<span class="eyebrow-sub">Research <span class="dot">•</span> Projects <span class="dot">•</span> Exploration</span></div>
+    <h1>Hamna <span class="thin">Qaseem</span></h1>
+    <div class="hero-role">AI Engineer · Exploring Robotics &amp; Intelligent Systems</div>
+    <p class="hero-sub">Building AI for autonomous systems — and exploring how machines should communicate confidence, uncertainty, and reasoning when human judgment is on the line.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn solid">View Research Modules</a>
+      <a href="#contact" class="btn">Research Collaboration</a>
+    </div>
+  </div>
+  <div class="telemetry">
+    <div class="tele-item"><div class="val">2+</div><div class="lbl">Yrs AI Engineering</div></div>
+    <div class="tele-item"><div class="val">10</div><div class="lbl">Research Modules</div></div>
+    <div class="tele-item"><div class="val">01</div><div class="lbl">Conference Abstract</div></div>
+    <div class="tele-item"><div class="val">3.9</div><div class="lbl">GPA · BS Data Science</div></div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="sec-head reveal">
+    <div class="sec-tag">Operator Profile</div>
+    <h2 class="sec-title">Human in the loop</h2>
+  </div>
+  <div class="about-grid">
+    <div class="reveal">
+      <div class="hud">
+        <svg class="hud-ring" viewBox="0 0 300 300" fill="none">
+          <circle cx="150" cy="150" r="148" stroke="rgba(111,183,255,.25)" stroke-width="1" stroke-dasharray="2 6"/>
+          <circle cx="150" cy="2" r="3" fill="#FFB454"/>
+        </svg>
+        <svg class="hud-ring r2" viewBox="0 0 300 300" fill="none">
+          <circle cx="150" cy="150" r="140" stroke="rgba(148,178,220,.3)" stroke-width="1" stroke-dasharray="60 200"/>
+          <circle cx="150" cy="150" r="140" stroke="rgba(242,160,198,.55)" stroke-width="1" stroke-dasharray="10 430"/>
+        </svg>
+        <div class="hud-photo" id="hudPhoto" title="Toggle simulation mode">
+          <img class="ph-real" src="assets/hamna-profile.jpg" alt="Hamna Qaseem">
+          <img class="ph-sim" src="assets/avatar-sim.jpg" alt="Hamna Qaseem — simulation avatar">
+        </div>
+        <div class="hud-scan"></div>
+        <div class="hud-label" id="hudLabel">HQ-01 · ONLINE</div>
+        <button class="hud-toggle" id="hudToggle">ENTER SIM ⇄</button>
+      </div>
+    </div>
+    <div class="about-copy reveal">
+      <p><b>I'm an AI engineer moving from machine learning toward embodied intelligence</b> — designing systems that don't just generate answers, but help people decide when to trust them.</p>
+      <p>After two years building production LLM systems, RAG pipelines, and multi-agent architectures at <b>Mutare Group</b>, I'm now a Research Associate in <b>Blue Marble Space's Young Scientist Program</b> — designing future human habitats for the Moon and Mars that could support ~100-person communities, guided by planetary architecture, in-situ resource utilization, and real engineering constraints, and brought to life through AI-assisted visualization for education and outreach.</p>
+      <p>Woven through it all is one research question I keep returning to: <b>how should AI communicate confidence and uncertainty</b> so that humans — founders, habitat crews, anyone — know when to rely on it and when to question it.</p>
+      <p>Alongside research, I'm hands-on in the lab: simulating autonomous robots in <b>Webots and ROS 2</b>, prototyping embedded systems on <b>ESP32 and Jetson Nano</b>, and sharing everything I learn in public along the way — the wins, the failures, and the small victories in between.</p>
+      <div class="roles">
+        <div class="role"><span class="r-title live">Research Associate — Habitat Design &amp; Autonomy</span><span class="r-org">BLUE MARBLE SPACE · YSP 2026</span></div>
+        <div class="role"><span class="r-title live">Independent Researcher — FounderMind</span><span class="r-org">PAPER STUDY · EARLY STAGE</span></div>
+        <div class="role"><span class="r-title">AI/ML Engineer (Generative AI)</span><span class="r-org">MUTARE GROUP · 2024–2026</span></div>
+        <div class="role"><span class="r-title">AI Educator &amp; RL Study Group Lead</span><span class="r-org">COMMUNITY · ONGOING</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="focus">
+  <div class="sec-head reveal">
+    <div class="sec-tag">Research Directions</div>
+    <h2 class="sec-title">Three connected questions</h2>
+    <p class="sec-sub">One thread runs through all of my work: how should intelligent systems behave when humans must rely on them under uncertainty?</p>
+  </div>
+  <div class="focus-grid">
+    <div class="focus-card reveal">
+      <span class="f-code">DIR-01</span>
+      <div class="f-ico"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><circle cx="19" cy="19" r="14" stroke="#6FB7FF" stroke-width="1.2"/><path d="M19 8v6M19 24v6M8 19h6M24 19h6" stroke="#6FB7FF" stroke-width="1.2"/><circle cx="19" cy="19" r="4" fill="none" stroke="#FFB454" stroke-width="1.4"/></svg></div>
+      <h3>Trustworthy AI &amp; Confidence Calibration</h3>
+      <p>How AI systems should communicate confidence, uncertainty, assumptions, and risk — so people develop an accurate sense of when to rely on them and when to question them. Grounded in explainable AI and trust-calibration literature.</p>
+    </div>
+    <div class="focus-card reveal">
+      <span class="f-code">DIR-02</span>
+      <div class="f-ico"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="14" y="6" width="10" height="8" rx="2" stroke="#6FB7FF" stroke-width="1.2"/><path d="M19 14v5M12 25l7-6 7 6M12 25v7M26 25v7" stroke="#6FB7FF" stroke-width="1.2"/><circle cx="17" cy="10" r="1.2" fill="#FFB454"/><circle cx="21" cy="10" r="1.2" fill="#FFB454"/></svg></div>
+      <h3>Robotics &amp; Simulation (Learning)</h3>
+      <p>Learning the embodied side of intelligent systems step by step — starting with finite-state-machine controllers and sensor-driven navigation in Webots, and slowly working toward real hardware with ROS 2.</p>
+    </div>
+    <div class="focus-card reveal">
+      <span class="f-code">DIR-03</span>
+      <div class="f-ico"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M6 28a13 13 0 0126 0" stroke="#6FB7FF" stroke-width="1.2"/><path d="M11 28a8 8 0 0116 0" stroke="#6FB7FF" stroke-width="1.2" opacity=".55"/><line x1="4" y1="28" x2="34" y2="28" stroke="#6FB7FF" stroke-width="1.2"/><circle cx="19" cy="15" r="1.6" fill="#FFB454"/><circle cx="28" cy="9" r="1" fill="#6FB7FF" opacity=".7"/><circle cx="9" cy="7" r="0.8" fill="#6FB7FF" opacity=".5"/></svg></div>
+      <h3>Extreme-Environment Autonomy</h3>
+      <p>Decision support for habitats and field systems operating under communication delay — where operators can't phone home, and calibrated machine confidence becomes a life-support question.</p>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="sec-head reveal">
+    <div class="sec-tag">Exploration Lab</div>
+    <h2 class="sec-title">Research modules</h2>
+    <p class="sec-sub">Every module is real, built, and documented — from production LLM systems to robot controllers and embedded habitat experiments.</p>
+  </div>
+  <div class="filters reveal">
+    <button class="filter active" data-f="all">All Systems</button>
+    <button class="filter" data-f="trust">Independent Research</button>
+    <button class="filter" data-f="robotics">Robotics</button>
+    <button class="filter" data-f="llm">LLM Systems</button>
+    <button class="filter" data-f="habitat">Habitat Research</button>
+    <button class="filter" data-f="data">Data &amp; Products</button>
+  </div>
+  <div class="proj-grid">
+
+    <article class="proj reveal" data-cat="trust">
+      <div class="thumb"><img src="assets/foundermind.jpg" alt="FounderMind — exploring how AI communicates confidence and uncertainty" loading="lazy"></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD A-01 · IN PROGRESS</span>
+        <h3>FounderMind — Independent Research</h3>
+        <p>An early-stage independent research project asking how AI should communicate confidence and uncertainty, not just answers. Right now I'm in the paper-study phase — reading work on calibrated verbalized confidence (Mündler et al.) and trust calibration — and sketching the first ideas. No results yet; I'm sharing the journey as it unfolds.</p>
+        <div class="tags"><span class="tag">Trust Calibration</span><span class="tag">Paper Study</span><span class="tag">LLMs</span></div>
+        <div class="proj-links"><a href="https://app.notion.com/p/1-Research-Foundation-39441dd91af481cc8992ea0dd389008c?source=copy_link" target="_blank" rel="noopener">Research Foundation (Notion) ↗</a></div>
+      </div>
+    </article>
+
+    <article class="proj reveal" data-cat="trust habitat">
+      <div class="thumb"><img src="assets/ysp-habitats.jpg" alt="YSP Research — confidence-aware habitat decision support with Blue Marble Space" loading="lazy"></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD A-02 · IN PROGRESS</span>
+        <h3>Designing Future Human Habitats — Moon &amp; Mars</h3>
+        <p>My Blue Marble Space YSP research: designing an original habitat concept for a ~100-person community — surface and subsurface structures shaped by planetary architecture, ISRU, and real engineering constraints — visualized with design tools and AI imagery for education and outreach. Alongside it, I'm researching confidence-aware decision support for habitat crews; a co-authored abstract is submitted to Space Habitat Event 2026.</p>
+        <div class="tags"><span class="tag">Planetary Habitats</span><span class="tag">ISRU</span><span class="tag">Human-Autonomy Teaming</span><span class="tag">AI Visualization</span></div>
+        <div class="proj-links"><a href="https://medium.com/@hamnaqaseem" target="_blank" rel="noopener">Research Notes ↗</a></div>
+      </div>
+    </article>
+
+    <article class="proj reveal" data-cat="robotics">
+      <div class="thumb"><img src="assets/fsm-webots.jpg" alt="Webots simulation — e-puck robot navigating between two obstacles" loading="lazy"></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD B-01</span>
+        <h3>FSM Controller — E-puck Robot (Webots)</h3>
+        <p>A seven-state finite state machine driving an e-puck through obstacle navigation, 180° turns, and IR-sensor wall following — with hand-tuned sensor thresholds and turn timing. Built for CU Boulder's robotics specialization; full lab report and simulation video recorded.</p>
+        <div class="tags"><span class="tag">Webots</span><span class="tag">FSM</span><span class="tag">IR Sensors</span><span class="tag">CU Boulder</span></div>
+        <div class="proj-links"><a href="https://drive.google.com/file/d/1WAoF3fHGIc9bqrM_EQ1X8Sv-_Lfo_ha6/view" target="_blank" rel="noopener">Simulation Video ↗</a></div>
+      </div>
+    </article>
+
+    <article class="proj reveal" data-cat="robotics">
+      <div class="thumb"><img src="assets/line-following.jpg" alt="Webots line-following track with start line" loading="lazy"></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD B-02</span>
+        <h3>Line Following with Encoder Odometry</h3>
+        <p>Ground-sensor line following fused with wheel-encoder odometry to estimate pose while tracking a curved path — the second Webots lab in the CU Boulder specialization, extending FSM work toward continuous sensor-driven control.</p>
+        <div class="tags"><span class="tag">Webots</span><span class="tag">Odometry</span><span class="tag">Control</span></div>
+        <div class="proj-links"><a href="https://github.com/Hamna12" target="_blank" rel="noopener">GitHub ↗</a></div>
+      </div>
+    </article>
+
+    <article class="proj reveal" data-cat="robotics">
+      <div class="thumb"><svg viewBox="0 0 320 180" fill="none"><rect width="320" height="180" fill="#0E1626"/><rect x="40" y="46" width="72" height="46" rx="3" stroke="#6FB7FF" stroke-width="1.3"/><rect x="200" y="40" width="82" height="52" rx="3" stroke="#6FB7FF" stroke-width="1.3"/><rect x="120" y="120" width="84" height="34" rx="3" stroke="#FFB454" stroke-width="1.3"/><path d="M112 69h88M241 92v14l-79 14M80 92v14l82 14" stroke="rgba(148,178,220,.4)" stroke-dasharray="3 4"/><text x="52" y="73" fill="#6FB7FF" font-family="monospace" font-size="9">LAPTOP</text><text x="210" y="70" fill="#6FB7FF" font-family="monospace" font-size="9">JETSON</text><text x="132" y="141" fill="#FFB454" font-family="monospace" font-size="9">ARDUINO</text><text x="30" y="30" fill="#5A6A85" font-family="monospace" font-size="9" letter-spacing="2">ROS 2 NODE GRAPH</text></svg></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD B-03</span>
+        <h3>ESP32 Hardware Practice &amp; ROS 2 Setup</h3>
+        <p>Practicing hands-on hardware building with ESP32 while assembling a ROS 2 setup across my laptop, Jetson Nano, and Arduino Mega — my step-by-step path from simulation toward real robots. Early days, and I'm documenting every step.</p>
+        <div class="tags"><span class="tag">ROS 2</span><span class="tag">Jetson Nano</span><span class="tag">ESP32</span><span class="tag">Arduino</span></div>
+      </div>
+    </article>
+
+    
+
+    <article class="proj reveal" data-cat="llm">
+      <div class="thumb"><img src="assets/ticket-triage.jpg" alt="Support Ticket Triage Agent — AI-powered ticket classification and prioritization" loading="lazy"></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD C-01</span>
+        <h3>Support Ticket Triage Agent</h3>
+        <p>An AI-powered agent that automatically classifies, prioritizes, and routes incoming support tickets — smart classification across categories like authentication, billing, and technical issues, with priority prediction and auto-tagging for faster response times. Built with Python, scikit-learn, and pandas.</p>
+        <div class="tags"><span class="tag">Python</span><span class="tag">Scikit-Learn</span><span class="tag">Pandas</span><span class="tag">NLP</span></div>
+        <div class="proj-links"><a href="https://github.com/Hamna12/Support-Ticket-Triage-Agent" target="_blank" rel="noopener">GitHub ↗</a></div>
+      </div>
+    </article>
+
+    <article class="proj reveal" data-cat="llm">
+      <div class="thumb"><svg viewBox="0 0 320 180" fill="none"><rect width="320" height="180" fill="#0E1626"/><rect x="60" y="44" width="200" height="92" rx="4" stroke="rgba(148,178,220,.4)"/><text x="74" y="70" fill="#6FB7FF" font-family="monospace" font-size="10">$ ollama run llama3</text><text x="74" y="90" fill="#8494AD" font-family="monospace" font-size="10">&gt;&gt; loading local weights…</text><text x="74" y="110" fill="#FFB454" font-family="monospace" font-size="10">latency: 84ms · cost: $0.00</text><circle cx="74" cy="52" r="2" fill="#FFB454"/><text x="30" y="30" fill="#5A6A85" font-family="monospace" font-size="9" letter-spacing="2">LOCAL INFERENCE</text></svg></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD C-02</span>
+        <h3>Local LLM Inference Engine</h3>
+        <p>An offline-first LLM system built on Ollama with context-aware prompt chains, session memory, and a live debugging UI — replacing API calls with local execution to cut inference cost and latency.</p>
+        <div class="tags"><span class="tag">Ollama</span><span class="tag">LangChain</span><span class="tag">Streamlit</span><span class="tag">Redis</span></div>
+        <div class="proj-links"><a href="https://github.com/Hamna12" target="_blank" rel="noopener">GitHub ↗</a></div>
+      </div>
+    </article>
+
+    <article class="proj reveal" data-cat="llm">
+      <div class="thumb"><img src="assets/career-intellect.jpg" alt="AI Resume Analysis — smart screening and skill matching" loading="lazy"></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD C-03</span>
+        <h3>Career Intellect — AI Resume Analysis</h3>
+        <p>Hackathon team project: an OpenAI-powered platform that parses resumes against job descriptions and returns SWOT analysis, skill gaps, and role-alignment recommendations through optimized few-shot prompt pipelines.</p>
+        <div class="tags"><span class="tag">OpenAI API</span><span class="tag">NLP</span><span class="tag">ATS</span></div>
+        <div class="proj-links"><a href="https://github.com/lucifer1708/Hackathon" target="_blank" rel="noopener">GitHub ↗</a></div>
+      </div>
+    </article>
+
+    <article class="proj reveal" data-cat="llm data">
+      <div class="thumb"><img src="assets/am-i-slacking-off.jpg" alt="Am I Slacking Off — live YOLO detection during a coding session" loading="lazy"></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD C-04</span>
+        <h3>Am I Slacking Off? — CV Productivity Monitor</h3>
+        <p>A real-time computer vision system that catches me slacking — custom-labeled dataset, fine-tuned YOLO detector, and an alerting layer that responds to prolonged distraction. That screenshot is it working live, mid-coding-session.</p>
+        <div class="tags"><span class="tag">YOLO</span><span class="tag">OpenCV</span><span class="tag">Computer Vision</span></div>
+        <div class="proj-links"><a href="https://github.com/Hamna12/AM-I-SLACKING-OFF" target="_blank" rel="noopener">GitHub ↗</a></div>
+      </div>
+    </article>
+
+    <article class="proj reveal" data-cat="data">
+      <div class="thumb"><img src="assets/edu-analytics.jpg" alt="Educational Performance Analytics — discover educational trends and patterns" loading="lazy"></div>
+      <div class="proj-body">
+        <span class="proj-code">MOD D-01</span>
+        <h3>Educational Performance Analytics</h3>
+        <p>Final-year project: TensorFlow models predicting educational outcomes from socio-economic data across 639,000+ student records — surfacing five key indicators, served through FastAPI and an interactive Streamlit dashboard.</p>
+        <div class="tags"><span class="tag">TensorFlow</span><span class="tag">FastAPI</span><span class="tag">Streamlit</span></div>
+        <div class="proj-links"><a href="https://github.com/Hamna12/Final-Year-Project" target="_blank" rel="noopener">GitHub ↗</a></div>
+      </div>
+    </article>
+
+    
+
+  </div>
+</section>
+
+<section id="lab">
+  <div class="lab-inner">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Robotics Learning Journey</div>
+      <h2 class="sec-title">Inside my learning lab</h2>
+      <p class="sec-sub">I'm learning robotics from the ground up, simulation-first — and documenting every step honestly. This is the actual state machine from my first Webots e-puck controller: seven states, tuned through trial, error, and a lot of patience.</p>
+    </div>
+    <div class="fsm-wrap reveal">
+      <svg viewBox="0 0 900 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#6FB7FF"/></marker>
+        </defs>
+        <!-- states -->
+        <g font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">
+          <rect x="20" y="90" width="104" height="44" rx="22" stroke="#6FB7FF" stroke-width="1.4"/><text x="72" y="116" fill="#D7E1F0">FORWARD1</text>
+          <rect x="150" y="90" width="104" height="44" rx="22" stroke="#6FB7FF" stroke-width="1.4"/><text x="202" y="116" fill="#D7E1F0">TURN180</text>
+          <rect x="280" y="90" width="112" height="44" rx="22" stroke="#6FB7FF" stroke-width="1.4"/><text x="336" y="116" fill="#D7E1F0">MOVE_AWAY</text>
+          <rect x="418" y="90" width="104" height="44" rx="22" stroke="#6FB7FF" stroke-width="1.4"/><text x="470" y="116" fill="#D7E1F0">FORWARD2</text>
+          <rect x="548" y="90" width="112" height="44" rx="22" stroke="#6FB7FF" stroke-width="1.4"/><text x="604" y="116" fill="#D7E1F0">TURNRIGHT</text>
+          <rect x="686" y="90" width="116" height="44" rx="22" stroke="#6FB7FF" stroke-width="1.4"/><text x="744" y="116" fill="#D7E1F0">FOLLOWLEFT</text>
+          <rect x="828" y="90" width="60" height="44" rx="22" stroke="#FFB454" stroke-width="1.6"/><text x="858" y="116" fill="#FFB454">STOP</text>
+        </g>
+        <!-- transitions -->
+        <g stroke="#6FB7FF" stroke-width="1.2" marker-end="url(#arr)">
+          <line x1="124" y1="112" x2="148" y2="112"/><line x1="254" y1="112" x2="278" y2="112"/><line x1="392" y1="112" x2="416" y2="112"/><line x1="522" y1="112" x2="546" y2="112"/><line x1="660" y1="112" x2="684" y2="112"/><line x1="802" y1="112" x2="826" y2="112"/>
+        </g>
+        <!-- condition labels -->
+        <g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#8494AD" text-anchor="middle">
+          <text x="136" y="86">obstacle o1</text><text x="267" y="86">turn done</text><text x="405" y="86">clear of o1</text><text x="534" y="86">obstacle o2</text><text x="672" y="86">rotated cw</text><text x="814" y="86">wall ends</text>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#5A6A85" text-anchor="middle">
+          <text x="72" y="156">front IR &gt; threshold</text><text x="202" y="156">timed rotation</text><text x="470" y="156">front IR &gt; threshold</text><text x="744" y="156">ps5 wall tracking</text>
+        </g>
+        <text x="450" y="210" fill="#5A6A85" font-family="IBM Plex Mono, monospace" font-size="9" text-anchor="middle" letter-spacing="3">FIG. 1 — FSM CONTROLLER · E-PUCK · WEBOTS 3×3 ARENA</text>
+      </svg>
+    </div>
+    <div class="lab-cols">
+      <div class="lab-card reveal">
+        <h4><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#6FB7FF" stroke-width="1.2"/><circle cx="8" cy="8" r="2.4" stroke="#FFB454" stroke-width="1.2"/></svg>Simulation Bench — Webots &amp; ROS 2</h4>
+        <ul>
+          <li>Robotics with Webots &amp; ROS 2 specialization — University of Colorado Boulder (Coursera)</li>
+          <li>FSM e-puck controller: obstacle navigation, 180° turns, IR wall following, timed rotations</li>
+          <li>Line following with encoder-based odometry for continuous pose estimation</li>
+          <li>Lesson learned the hard way: the MOVE_AWAY state — real robots need room to escape their last decision</li>
+          <li>Sensor calibration by experiment: IR sensors return intensity, not distance</li>
+        </ul>
+      </div>
+      <div class="lab-card reveal">
+        <h4><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13V8a5 5 0 0110 0v5" stroke="#6FB7FF" stroke-width="1.2"/><line x1="1" y1="13" x2="15" y2="13" stroke="#FFB454" stroke-width="1.2"/></svg>Hardware Bench — Embedded Systems</h4>
+        <ul>
+          <li>Multi-computer ROS 2 stack: laptop ↔ Jetson Nano ↔ Arduino Mega — setup in progress</li>
+          <li>Hands-on hardware implementation underway using ESP32 and other microcontrollers</li>
+          <li>Reinforcement learning study group lead — Q-Learning benchmark analysis on Atari evaluation practices (Agarwal et al., Machado et al.)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="sec-head reveal">
+    <div class="sec-tag">Mission Log</div>
+    <h2 class="sec-title">Experience</h2>
+  </div>
+  <div class="timeline">
+    <div class="t-item current reveal">
+      <span class="t-date">Jun 2026 — Present</span>
+      <h3>Research Associate</h3>
+      <div class="t-org">BLUE MARBLE SPACE · YOUNG SCIENTIST PROGRAM 2026</div>
+      <p>Designing future human habitats for the Moon and Mars supporting ~100-person communities — analyzing planetary architecture across research, concept art, and design competitions, and developing an original surface + subsurface habitat design guided by ISRU and life-support constraints, communicated through AI-assisted visualization for education and outreach. Alongside, early-stage research into confidence-aware decision support for habitat crews, with a co-authored abstract submitted to Space Habitat Event 2026.</p>
+    </div>
+    <div class="t-item reveal">
+      <span class="t-date">May 2024 — Mar 2026</span>
+      <h3>AI/ML Engineer — Generative AI</h3>
+      <div class="t-org">MUTARE GROUP LLC · MICHIGAN, USA (REMOTE)</div>
+      <p>Designed and deployed production RAG systems with LangChain + FAISS/ChromaDB, multi-agent pipelines for research and decision support, local inference with Ollama, and end-to-end LLM evaluation and monitoring — from data ingestion through retrieval, inference, and deployment.</p>
+    </div>
+    <div class="t-item reveal">
+      <span class="t-date">Mar 2024 — May 2024</span>
+      <h3>AI Engineer Intern</h3>
+      <div class="t-org">PLOMX</div>
+      <p>Built Generative AI features on LLM APIs for automation and NLP applications; integrated LLM components into full-stack systems and contributed to ML + LLM architecture design.</p>
+    </div>
+    <div class="t-item reveal">
+      <span class="t-date">Jan 2023 — Jul 2023</span>
+      <h3>WiDS Ambassador — Pakistan</h3>
+      <div class="t-org">WOMEN IN DATA SCIENCE · STANFORD UNIVERSITY</div>
+      <p>Selected to represent Pakistan (Bahawalpur), organizing regional events to bring the WiDS Worldwide conference to the local community. Also Global Ambassador at Women Tech Network and Women-in-Tech Associate at GDSC, The Islamia University of Bahawalpur.</p>
+    </div>
+    <div class="t-item reveal">
+      <span class="t-date">2020 — 2024</span>
+      <h3>BS in Data Science — GPA 3.9/4.0</h3>
+      <div class="t-org">THE ISLAMIA UNIVERSITY OF BAHAWALPUR</div>
+      <p>Machine Learning, Deep Learning, NLP, Data Visualization, Data Structures &amp; Algorithms. Final-year project: educational outcome prediction across 639,000+ student records.</p>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="sec-head reveal">
+    <div class="sec-tag">Systems Map</div>
+    <h2 class="sec-title">Technical stack</h2>
+  </div>
+  <div class="sys-grid">
+    <div class="sys reveal">
+      <h4><span>AI &amp; Machine Learning</span><span>SYS-01</span></h4>
+      <div class="chips"><span class="chip">Python</span><span class="chip">TensorFlow</span><span class="chip">PyTorch</span><span class="chip">Scikit-Learn</span><span class="chip">LLMs</span><span class="chip">RAG</span><span class="chip">LangChain</span><span class="chip">Multi-Agent Systems</span><span class="chip">Prompt Engineering</span><span class="chip">Confidence Calibration</span><span class="chip">OpenAI API</span><span class="chip">Ollama</span><span class="chip">YOLO</span><span class="chip">OpenCV</span></div>
+    </div>
+    <div class="sys reveal">
+      <h4><span>Robotics &amp; Embedded · Learning</span><span>SYS-02</span></h4>
+      <div class="chips"><span class="chip">ROS 2</span><span class="chip">Webots</span><span class="chip">Autonomous Navigation</span><span class="chip">Robot Modeling</span><span class="chip">Human-Robot Interaction</span><span class="chip">ESP32</span><span class="chip">Jetson Nano</span><span class="chip">Arduino</span><span class="chip">Sensor Calibration</span></div>
+    </div>
+    <div class="sys reveal">
+      <h4><span>Engineering &amp; Data</span><span>SYS-03</span></h4>
+      <div class="chips"><span class="chip">FastAPI</span><span class="chip">SQL</span><span class="chip">MongoDB</span><span class="chip">FAISS</span><span class="chip">ChromaDB</span><span class="chip">Azure</span><span class="chip">Docker</span><span class="chip">Git / GitHub</span><span class="chip">Linux</span><span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">Power BI</span><span class="chip">Streamlit</span></div>
+    </div>
+    <div class="sys reveal">
+      <h4><span>Research Methods</span><span>SYS-04</span></h4>
+      <div class="chips"><span class="chip">Experimental Design</span><span class="chip">Literature Review</span><span class="chip">Hypothesis Testing</span><span class="chip">Statistical Analysis</span><span class="chip">Scientific Reporting</span><span class="chip">Science Communication</span><span class="chip">Technical Documentation</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="awards">
+  <div class="sec-head reveal">
+    <div class="sec-tag">Signals</div>
+    <h2 class="sec-title">Recognition &amp; publications</h2>
+  </div>
+  <div class="aw-grid">
+    <div class="aw reveal">
+      <div class="a-ico"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 2l3 6.5 7 .8-5.2 4.7 1.5 6.9L13 17.4 6.7 20.9l1.5-6.9L3 9.3l7-.8L13 2z" stroke="#FFB454" stroke-width="1.2"/></svg></div>
+      <div><h4>Conference Abstract — Space Habitat Event 2026</h4><p>"A Confidence-Aware Decision Support Framework for Space Habitat Operations Under Communication Delay" — co-authored with my research mentor, submitted.</p><div class="a-meta">Publication · 2026</div></div>
+    </div>
+    <div class="aw reveal">
+      <div class="a-ico"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="10" r="7" stroke="#6FB7FF" stroke-width="1.2"/><path d="M9 16l-2 8 6-3 6 3-2-8" stroke="#6FB7FF" stroke-width="1.2"/></svg></div>
+      <div><h4>Winner — WebGPU Hackathon</h4><p>AI solution leveraging GPU acceleration for real-time inference.</p><div class="a-meta">LabLab.ai · Jan 2024</div></div>
+    </div>
+    <div class="aw reveal">
+      <div class="a-ico"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="10" r="7" stroke="#6FB7FF" stroke-width="1.2"/><path d="M9 16l-2 8 6-3 6 3-2-8" stroke="#6FB7FF" stroke-width="1.2"/></svg></div>
+      <div><h4>Winner — WWCode 7-Day Kaggle EDA Challenge</h4><p>Top rank in exploratory data analysis, visualization, and statistical storytelling.</p><div class="a-meta">Women Who Code · Jan 2024</div></div>
+    </div>
+    <div class="aw reveal">
+      <div class="a-ico"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M4 20c3-2 5-6 9-6s6 4 9 6" stroke="#6FB7FF" stroke-width="1.2"/><circle cx="13" cy="8" r="4" stroke="#FFB454" stroke-width="1.2"/></svg></div>
+      <div><h4>Learning in Public</h4><p>Documenting my journey from AI engineering into robotics and research: project breakdowns, papers explained simply, and honest lessons from failures — on LinkedIn, Instagram, YouTube, and Medium.</p><div class="a-meta">Community · Ongoing</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="vision">
+  <div class="vision-inner">
+    <div class="sec-tag reveal" style="justify-content:center">Research Direction</div>
+    <blockquote class="reveal">I'm interested in building intelligent autonomous systems capable of operating in <em>complex, remote, and communication-constrained environments</em> — embodied AI, robotic autonomy, and technologies that enable exploration beyond conventional terrestrial settings.</blockquote>
+    <div class="v-path reveal">
+      <span class="v-node">AI</span><span class="v-link"></span><span class="v-node">Embodied Intelligence</span><span class="v-link"></span><span class="v-node">Autonomous Robotics</span><span class="v-link"></span><span class="v-node">Extreme Environments</span><span class="v-link"></span><span class="v-node">Future Exploration</span>
+    </div>
+  </div>
+  <svg class="horizon" viewBox="0 0 1200 140" preserveAspectRatio="none" fill="none">
+    <path d="M0 140 Q 600 40 1200 140" stroke="rgba(111,183,255,.22)" stroke-width="1"/>
+    <circle cx="240" cy="86" r="1.2" fill="#D7E1F0" opacity=".6"/><circle cx="410" cy="62" r="0.9" fill="#D7E1F0" opacity=".45"/><circle cx="700" cy="48" r="1.1" fill="#D7E1F0" opacity=".55"/><circle cx="905" cy="66" r="0.8" fill="#D7E1F0" opacity=".4"/><circle cx="1060" cy="92" r="1.3" fill="#F2A0C6" opacity=".65"/>
+  </svg>
+</section>
+
+<section id="contact">
+  <div class="sec-head reveal" style="margin-bottom:10px">
+    <div class="sec-tag" style="justify-content:center">Open Channel</div>
+    <h2 class="sec-title">Let's build intelligent systems</h2>
+    <p class="sec-sub" style="margin-left:auto;margin-right:auto">Open to research collaboration, AI engineering roles, and conversations about trustworthy autonomy.</p>
+  </div>
+  <a class="c-mail reveal" href="mailto:hamnaqaseem@gmail.com">hamnaqaseem@gmail.com</a>
+  <div class="c-links reveal">
+    <a href="https://github.com/Hamna12" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.linkedin.com/in/hamna-qaseem/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://www.youtube.com/@ham_code" target="_blank" rel="noopener">YouTube</a>
+    <a href="https://medium.com/@hamnaqaseem" target="_blank" rel="noopener">Medium</a>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 HAMNA QASEEM · DESIGNING INTELLIGENT FUTURES</span>
+  <span class="const"><svg width="90" height="16" viewBox="0 0 90 16" fill="none"><circle cx="6" cy="10" r="1.2" fill="#6FB7FF"/><circle cx="26" cy="5" r="1" fill="#6FB7FF"/><circle cx="48" cy="11" r="1.3" fill="#6FB7FF"/><circle cx="68" cy="4" r="0.9" fill="#6FB7FF"/><circle cx="84" cy="9" r="1.1" fill="#FFB454"/><path d="M6 10L26 5 48 11 68 4 84 9" stroke="rgba(111,183,255,.3)" stroke-width=".6"/></svg></span>
+  <span>DESIGNED FOR ENVIRONMENTS WHERE YOU CAN'T PHONE HOME</span>
+</footer>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- boot sequence ---- */
+  var boot = document.getElementById('boot');
+  var log = document.getElementById('bootlog');
+  var lines = ['INITIALIZING SYSTEMS…','LOADING NEURAL FIELD…','CALIBRATING SENSORS…','<span class="ok">LAB ONLINE ✓</span>'];
+  var li = 0;
+  var bootTimer = setInterval(function(){
+    li++;
+    if(li < lines.length){ log.innerHTML = lines[li]; }
+    else { clearInterval(bootTimer); boot.classList.add('done'); }
+  }, reduced ? 50 : 550);
+
+  /* ---- custom scanner cursor ---- */
+  var cursor = document.getElementById('cursor');
+  if (window.matchMedia('(pointer:fine)').matches && !reduced){
+    var cx=0, cy=0, tx=0, ty=0;
+    document.addEventListener('mousemove', function(e){ tx=e.clientX; ty=e.clientY; });
+    (function moveCursor(){
+      cx += (tx-cx)*0.22; cy += (ty-cy)*0.22;
+      cursor.style.transform = 'translate('+cx+'px,'+cy+'px) translate(-50%,-50%)';
+      requestAnimationFrame(moveCursor);
+    })();
+    document.querySelectorAll('a,button,.proj,.chip,.focus-card').forEach(function(el){
+      el.addEventListener('mouseenter', function(){ cursor.classList.add('scan'); });
+      el.addEventListener('mouseleave', function(){ cursor.classList.remove('scan'); });
+    });
+  } else { cursor.style.display='none'; }
+
+  /* ---- nav ---- */
+  var nav = document.getElementById('nav');
+  window.addEventListener('scroll', function(){ nav.classList.toggle('scrolled', window.scrollY > 30); }, {passive:true});
+  var toggle = document.getElementById('navToggle'), links = document.getElementById('navLinks');
+  toggle.addEventListener('click', function(){ links.classList.toggle('open'); });
+
+  /* smooth-scroll for ALL in-page links (hash navigation is blocked in sandboxed frames) */
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      var target = document.getElementById(a.getAttribute('href').slice(1));
+      if (target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
+      links.classList.remove('open');
+    });
+  });
+
+  /* ---- scroll reveal ---- */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, {threshold: 0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+  /* ---- project filters ---- */
+  var filters = document.querySelectorAll('.filter');
+  var projs = document.querySelectorAll('.proj');
+  filters.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filters.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var f = btn.dataset.f;
+      projs.forEach(function(p){
+        var show = f === 'all' || p.dataset.cat.split(' ').indexOf(f) !== -1;
+        p.classList.toggle('hide', !show);
+      });
+    });
+  });
+
+  /* ---- SIM mode toggle (real photo <-> voxel avatar) ---- */
+  var hud = document.querySelector('.hud');
+  var hudToggle = document.getElementById('hudToggle');
+  var hudLabel = document.getElementById('hudLabel');
+  var hudPhoto = document.getElementById('hudPhoto');
+  function flipSim(){
+    hud.classList.toggle('sim');
+    var sim = hud.classList.contains('sim');
+    hudLabel.textContent = sim ? 'HQ-01 · WEBOTS SIM' : 'HQ-01 · ONLINE';
+    hudToggle.textContent = sim ? 'EXIT SIM ⇄' : 'ENTER SIM ⇄';
+  }
+  hudToggle.addEventListener('click', flipSim);
+  hudPhoto.addEventListener('click', flipSim);
+
+  /* ---- THREE.js hero: neural particle field with hidden orbital layer ---- */
+  if (typeof THREE !== 'undefined' && !reduced){
+    var canvas = document.getElementById('field');
+    var renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true, antialias: true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    var scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x070B14, 0.055);
+    var camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    camera.position.set(0, 0.6, 9);
+
+    var isMobile = window.innerWidth < 700;
+
+    /* neural particle field — points scattered in a flat-ish disc that slowly assembles */
+    var N = isMobile ? 900 : 2200;
+    var pos = new Float32Array(N*3);
+    var start = new Float32Array(N*3);
+    for (var i=0;i<N;i++){
+      var r = 3 + Math.pow(Math.random(),0.6)*9;
+      var a = Math.random()*Math.PI*2;
+      pos[i*3]   = Math.cos(a)*r;
+      pos[i*3+1] = (Math.random()-0.5)*3.4;
+      pos[i*3+2] = Math.sin(a)*r - 2;
+      // start positions: scattered far — they assemble on load
+      start[i*3]   = pos[i*3]   + (Math.random()-0.5)*22;
+      start[i*3+1] = pos[i*3+1] + (Math.random()-0.5)*22;
+      start[i*3+2] = pos[i*3+2] + (Math.random()-0.5)*22;
+    }
+    var geo = new THREE.BufferGeometry();
+    var current = new Float32Array(start); // copy
+    geo.setAttribute('position', new THREE.BufferAttribute(current, 3));
+    var mat = new THREE.PointsMaterial({color: 0x6FB7FF, size: isMobile?0.035:0.028, transparent:true, opacity:0.75, blending:THREE.AdditiveBlending, depthWrite:false});
+    var points = new THREE.Points(geo, mat);
+    scene.add(points);
+
+    /* faint distant star layer (the hidden layer) */
+    var SN = isMobile ? 200 : 450;
+    var spos = new Float32Array(SN*3);
+    for (var s=0;s<SN;s++){
+      spos[s*3]   = (Math.random()-0.5)*70;
+      spos[s*3+1] = (Math.random()-0.35)*40;
+      spos[s*3+2] = -30 - Math.random()*30;
+    }
+    var sgeo = new THREE.BufferGeometry();
+    sgeo.setAttribute('position', new THREE.BufferAttribute(spos, 3));
+    var smat = new THREE.PointsMaterial({color: 0xD7E1F0, size: 0.05, transparent:true, opacity:0.35, depthWrite:false});
+    scene.add(new THREE.Points(sgeo, smat));
+
+    /* orbital arcs — thin elliptical line loops, tilted */
+    function orbit(rx, rz, tilt, color, op){
+      var pts = [];
+      for (var k=0;k<=140;k++){
+        var t = (k/140)*Math.PI*2;
+        pts.push(new THREE.Vector3(Math.cos(t)*rx, 0, Math.sin(t)*rz));
+      }
+      var og = new THREE.BufferGeometry().setFromPoints(pts);
+      var ol = new THREE.Line(og, new THREE.LineBasicMaterial({color: color, transparent:true, opacity: op}));
+      ol.rotation.x = tilt; ol.position.z = -2;
+      scene.add(ol);
+      return ol;
+    }
+    var o1 = orbit(6.5, 5.2, Math.PI/2.35, 0x6FB7FF, 0.16);
+    var o2 = orbit(9.5, 8.0, Math.PI/2.15, 0x8494AD, 0.10);
+    var o3 = orbit(12.5, 10.5, Math.PI/2.5, 0xF2A0C6, 0.09);
+
+    /* one amber "satellite" tracing the inner orbit */
+    var sat = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({color:0xFFB454}));
+    scene.add(sat);
+
+    var mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', function(e){
+      mouseX = (e.clientX / window.innerWidth - 0.5);
+      mouseY = (e.clientY / window.innerHeight - 0.5);
+    });
+
+    function resize(){
+      var w = canvas.clientWidth || window.innerWidth;
+      var h = canvas.clientHeight || window.innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w/h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    var t0 = performance.now();
+    var heroVisible = true;
+    new IntersectionObserver(function(en){ heroVisible = en[0].isIntersecting; }, {threshold:0}).observe(document.getElementById('hero'));
+
+    (function animate(){
+      requestAnimationFrame(animate);
+      if(!heroVisible) return;
+      var t = (performance.now() - t0)/1000;
+
+      /* assembly: ease particles from scattered start to target over ~3.5s */
+      var p = Math.min(t/3.5, 1);
+      var e = 1 - Math.pow(1-p, 3);
+      var arr = geo.attributes.position.array;
+      for (var j=0;j<N;j++){
+        var j3 = j*3;
+        arr[j3]   = start[j3]   + (pos[j3]  -start[j3])  *e;
+        arr[j3+1] = start[j3+1] + (pos[j3+1]-start[j3+1])*e + Math.sin(t*0.6 + j)*0.03;
+        arr[j3+2] = start[j3+2] + (pos[j3+2]-start[j3+2])*e;
+      }
+      geo.attributes.position.needsUpdate = true;
+
+      points.rotation.y = t*0.03;
+      o1.rotation.z = t*0.02; o2.rotation.z = -t*0.012; o3.rotation.z = t*0.008;
+
+      var st = t*0.25;
+      sat.position.set(Math.cos(st)*6.5, Math.sin(st)*5.2*Math.cos(Math.PI/2.35), Math.sin(st)*5.2*Math.sin(Math.PI/2.35)-2);
+
+      camera.position.x += (mouseX*1.4 - camera.position.x)*0.03;
+      camera.position.y += (0.6 - mouseY*1.0 - camera.position.y)*0.03;
+      camera.lookAt(0, 0, -2);
+
+      renderer.render(scene, camera);
+    })();
+  } else {
+    /* reduced motion / no WebGL: quiet static gradient */
+    document.getElementById('field').style.background =
+      'radial-gradient(ellipse 70% 55% at 50% 42%, rgba(111,183,255,.10), transparent 65%)';
+  }
+})();
+</script>
+</body>
+</html>
